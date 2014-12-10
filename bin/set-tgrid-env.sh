@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # - Set or override the JAVA_HOME variable
 # - By default, the system value is used.
