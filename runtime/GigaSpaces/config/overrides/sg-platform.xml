@@ -1,0 +1,47 @@
+<!--
+This configuration override will load only the ServiceGrid jars in the platform
+-->
+<overrides>
+
+    <!-- 
+    Declare the platformJARs using only the Service Grid jars, Jini and Ant 
+    -->
+    <Component Name="com.gigaspaces.start">
+        <Parameter Name="platformJARs">
+	    <![CDATA[
+	    org.jini.rio.boot.BootUtil.toURLs(
+	        new String[] {
+	            "${com.gigaspaces.grid.lib}${/}gsc-capabilities.jar",
+	            "${com.gigaspaces.grid.lib}${/}gs-lib.jar",
+	            "${com.gigaspaces.lib}{/}jini${/}jsk-lib.jar",
+	            "${com.gigaspaces.lib}${/}ant",
+	            })
+	    ]]>
+        </Parameter>
+	<!-- 
+	Define the com.gs.jini_lus.groups property 
+	-->
+    </Component>
+
+    <!--
+    Declare the ServiceBeanContextFactory
+    -->
+    <Component Name="service.load">
+        <Parameter Name="serviceBeanContextFactory"
+                   Value="new org.jini.rio.cybernode.JSBContextFactory()"/>
+    </Component>
+    
+    <!--
+    Add gs-space-framework.jar and JSpaces.jar to the classpath for the GSM, 
+    the SpaceProxyPreparer needs to be resolved
+    -->
+    <Component Name="com.gigaspaces.start.gsm">
+        <Parameter Name="classpath">
+	    <![CDATA[
+	    "${com.gigaspaces.grid.lib}{/}gs-service.jar${path.separator}"+
+	    "${com.gigaspaces.grid.lib}${/}gs-space-framework.jar${path.separator}"+
+	    "${com.gigaspaces.lib}${/}JSpaces.jar"
+	    ]]>
+        </Parameter>
+    </Component>
+</overrides>

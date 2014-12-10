@@ -1,0 +1,63 @@
+<!--
+This override can be used to change the Jini discovery groups the Service Grid
+uses. Each of these overrides sets it's respective property to be the value
+of the user's account name: ${user.name}. If an alternate value is desired,
+simply change ${user.name} (or add to it) as needed.
+
+The following overrides are defined :
+
+1. The com.gigaspaces.start.systemProperties override will define the
+   com.gs.jini_lus.groups property. This override is used by all Service Grid
+   components that will interct with the GigaSpace for discovery, creation and
+   administration (GSC, GSM and adminstrative tools)
+
+2. The com.gigaspaces.grid.groups override scopes the configures the
+   discovery groups the Service Grid will use to federate itself. This group
+   should not be confused with application focused groups, and is used for
+   GSCs to discover GSMs. This property is also read by the LookupHandler
+   utility
+
+3. The com.gigaspaces.admin.groups override sets the groups that the
+   administrative utilities will use for discovery.
+
+Using this override is explained here:
+
+Starting the GSC
+   $gsc ../config/overrides/own-group.xml
+
+Starting the GSM
+   $gsm ../config/overrides/own-group.xml
+
+Starting the Administrative UI
+   $gs-ui ../config/overrides/own-group.xml
+
+Starting the Administrative CLI
+   $gs ../config/overrides/own-group.xml
+-->
+<overrides>
+
+    <component Name="com.gigaspaces.start">
+        <parameter Name="systemProperties">
+            <![CDATA[
+	    new String[] { "com.gs.jini_lus.groups", "${user.name}" }
+            ]]>
+        </parameter>
+    </component>
+
+    <component Name="com.gigaspaces.grid">
+        <parameter Name="groups">
+            <![CDATA[
+	    new String[] { "${user.name}" }
+            ]]>
+        </parameter>
+    </component>
+
+    <component Name="com.gigaspaces.admin">
+        <parameter Name="groups">
+            <![CDATA[
+	    new String[] { "${user.name}" }
+            ]]>
+        </parameter>
+    </component>
+
+</overrides>

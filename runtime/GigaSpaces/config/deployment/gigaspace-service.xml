@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE gs-deployment SYSTEM "java://gs-deploy-desc.dtd">
+<!--
+This deployment descriptor is used to deploy the GigaSpace through the Service
+Grid when the GigaSpacesSupport is not a requirement. This deployment descriptor
+does not require GigaSpacesSupport to be enabled in the platform since the
+necessary implementation jars are loaded each time the service is instantiated.
+-->
+<gs-deployment Name="GigaSpace Service">
+    <Codebase>$[com.gigaspaces.system.codeserver]</Codebase>
+    <Groups>
+        <Group>${com.gs.jini_lus.groups}</Group>
+    </Groups>
+
+    <ServiceBean Name="GigaSpace" MatchOnName="yes">
+        <!--
+        Defines the codebase
+        -->
+        <Interfaces>
+            <Interface>net.jini.space.JavaSpace</Interface>
+            <Resources>
+                <JAR>JSpaces.jar</JAR>
+                <JAR>gs-dl.jar</JAR>
+            </Resources>
+        </Interfaces>
+
+        <!--
+        Defines the Implementation jars
+        -->
+        <ImplementationClass>com.j_spaces.core.client.SpaceFinder
+            <Resources>
+                <JAR>../lib/JSpaces.jar</JAR>
+                <JAR>lib/gs-space-framework.jar</JAR>
+                <JAR>../lib/common/backport-util-concurrent.jar</JAR>
+            </Resources>
+        </ImplementationClass>
+
+        <!--
+        Defines the system requirements and the parameters for a scaling
+        policy handler
+        -->
+        <ServiceLevelAgreements>
+            <SystemRequirements>
+                <Utilization ID="CPU" High=".9"/>
+                <Utilization ID="Memory" High=".99"/>
+            </SystemRequirements>
+            <SLA ID="CPU" Low=".2" High=".8">
+                <PolicyHandler type="scaling" max="3"
+                               lowerDampener="3000" upperDampener="3000"/>
+            </SLA>
+        </ServiceLevelAgreements>
+
+        <!--
+        Defines the GigaSpacesFaultDetectionHandler
+        -->
+        <FaultDetectionHandler
+            ClassName="com.gigaspaces.grid.space.GigaSpacesFaultDetectionHandler">
+            <Configuration>
+                <Component
+                    Name="com.gigaspaces.grid.space.GigaSpacesFaultDetectionHandler">
+                    <Parameter Name="retryCount" Value="1"/>
+                    <Parameter Name="invocationDelay" Value="5000"/>
+                </Component>
+            </Configuration>
+        </FaultDetectionHandler>
+
+        <!--
+        Defines service provisioning configuration properties
+        -->
+        <ServiceProvisionConfig>
+            <Configuration>
+                <Component Name="service.provision">
+                    <Parameter
+                        Name="proxyPreparer"
+                        Value="new com.gigaspaces.grid.space.SpaceProxyPreparer()"/>
+                </Component>
+            </Configuration>
+        </ServiceProvisionConfig>
+
+        <Configuration>
+            <Component Name="service.load">
+                <Parameter
+                    Name="serviceBeanFactory"
+                    Value="new com.gigaspaces.grid.space.SpaceHandler()"/>
+                <Parameter
+                    Name="serviceBeanContextFactory"
+                    Value="new com.gigaspaces.grid.space.GSContextFactory()"/>
+            </Component>
+        </Configuration>
+
+        <Maintain>1</Maintain>
+
+        <MaxPerMachine>1</MaxPerMachine>
+
+        <Comment>GigaSpace Technologies Inc. EE Service</Comment>
+    </ServiceBean>
+
+</gs-deployment>

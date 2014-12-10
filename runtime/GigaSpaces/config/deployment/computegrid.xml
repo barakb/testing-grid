@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE gs-deployment SYSTEM "java://gs-deploy-desc.dtd">
+
+<gs-deployment Name="Compute Grid">
+
+    <!-- Declare global attributes for the Deployment Descriptor  -->
+    <Codebase>$[com.gigaspaces.system.codeserver]</Codebase>
+    <Groups>
+        <Group>${com.gs.jini_lus.groups}</Group>
+    </Groups>
+
+    <!--
+     The services in this Deployment Descriptor require an association to
+     the GigaSpace deployment. It is declared here as a global property,
+     each service declaration will include this association
+    -->
+    <Association Type="requires" Name="GigaSpace" refid="space.desc"/>
+
+    <!-- Declare attributes for the Job Submission service -->
+    <ServiceBean Name="Job Submission">
+        <Interfaces>
+            <Interface>com.gigaspaces.grid.master.JobSubmission</Interface>
+            <Resources>
+                <JAR>gs-space-framework.jar</JAR>
+                <JAR>gs-dl.jar</JAR>
+                <JAR>JSpaces.jar</JAR>
+            </Resources>
+        </Interfaces>
+
+        <ImplementationClass>com.gigaspaces.grid.master.JobSubmissionImpl
+        </ImplementationClass>
+
+        <Configuration>
+            <Component Name="com.gigaspaces.grid.master">
+                <!-- Declare the Service UI -->
+                <Parameter Name="serviceUIs">
+                    <![CDATA[
+                        new net.jini.core.entry.Entry[]{
+                            org.jini.rio.entry.UIDescriptorFactory.getJComponentDesc(
+                                "file:../lib/ServiceGrid",
+                                "gs-service-ui.jar",
+                                "com.gigaspaces.grid.master.ui.JobSubmissionUI")}
+                        ]]>
+                </Parameter>
+            </Component>
+        </Configuration>
+
+        <Logging>
+            <Logger Name="com.gigaspaces.grid.master" Level="FINEST">
+                <Handler ClassName="java.util.logging.ConsoleHandler"
+                         Level="FINEST"/>
+            </Logger>
+        </Logging>
+
+        <Maintain>1</Maintain>
+
+        <Comment>Job Submission Service</Comment>
+    </ServiceBean>
+
+
+    <!-- Declare attributes for the GigaSpace worker service -->
+    <ServiceBean Name="GigaSpace Worker">
+        <Interfaces>
+            <Interface>com.gigaspaces.grid.worker.SpaceStation</Interface>
+            <Resources>
+                <JAR>gs-space-framework.jar</JAR>
+                <JAR>gs-dl.jar</JAR>
+            </Resources>
+        </Interfaces>
+
+        <ImplementationClass>com.gigaspaces.grid.worker.GigaSpaceStationImpl
+        </ImplementationClass>
+
+        <ServiceLevelAgreements>
+            <SystemRequirements>
+                <Utilization ID="CPU" High=".9" />
+            </SystemRequirements>
+
+            <SLA ID="backlog" Low="100" High="500">
+                <PolicyHandler type="scaling" max="10"
+                               lowerDampener="3000" upperDampener="3000"/>
+            </SLA>
+
+        </ServiceLevelAgreements>
+
+        <Maintain>2</Maintain>
+
+        <MaxPerMachine>5</MaxPerMachine>
+
+        <Parameters>
+            <Parameter Name="useWeakHashMap" Value="no"/>
+            <Parameter Name="useTransactions" Value="no"/>
+            <!--
+             Timeout for the worker blocking take, if not
+             defined the default is set to Long.MAX_VALUE
+            -->
+            <Parameter Name="timeout" Value="5000"/>
+        </Parameters>
+
+        <Comment>Generic GigaSpace Worker</Comment>
+
+    </ServiceBean>
+
+    <Include id="space.desc">
+        ${com.gs.home}config/deployment/gigaspace.xml</Include>
+
+</gs-deployment>

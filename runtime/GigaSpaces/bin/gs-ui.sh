@@ -5,6 +5,9 @@ scriptDir="$(dirname $0)"
 
 . `dirname $0`/setenv.sh
 
+SERVICE_GRID_LIB="$JSHOMEDIR/lib/ServiceGrid"
+JINI_LIB="$JSHOMEDIR/lib/jini"
+
 # Function to determine if path conversion is required
 toNative() {
     # Check for Cygwin
@@ -20,14 +23,14 @@ toWindows() {
     cygpath -pw "$@"
 }
 
-classpath="$(toNative $PRE_CLASSPATH:$JSHOMEDIR:$UI_JARS:$JDBC_JARS:$HIBERNATE_JARS:$JMX_JARS:$GS_JARS:$SPRING_JARS:$POST_CLASSPATH)"
+classpath="$(toNative $UI_JARS:$EXT_JARS:$JDBC_JARS:$HIBERNATE_JARS:$JMX_JARS:$SERVICE_GRID_LIB/gs-adminui.jar:$JSHOMEDIR/lib/JSpaces.jar:$SERVICE_GRID_LIB/gs-lib.jar:$JINI_LIB/jsk-lib.jar:$JINI_LIB/jsk-platform.jar:$OPENSPACES_JARS:$SPRING_JARS:$COMMON_JARS)"
 bootclasspath="-Xbootclasspath/p:$(toNative $XML_JARS)"
 launchTarget=com.gigaspaces.admin.ui.MainUI
-config="config/tools/adminui.config"
+config="$(toNative $JSHOMEDIR/config/tools/adminui.config)"
 
 command_line=$*
 
-NATIVE_DIR="$(toNative $JSHOMEDIR/lib/platform/native)"
+NATIVE_DIR="$(toNative $SERVICE_GRID_LIB/native)"
 
 opSys=`uname -s`
 if [ $opSys = "Darwin" ] ; then
@@ -40,7 +43,7 @@ fi
 SYS_PROPS="-Dcom.gs.env.report=false -Dcom.gs.jini.useDefinedGroupOnly=false -Dcom.gs.browser.containername=mySpace_container -Dcom.gs.logging.debug=true -Dcom.gs.embeddedQP.enabled=true -Djava.protocol.handler.pkgs=net.jini.url ${DARWIN_PROPS}"
 export SYS_PROPS
 
-command="$JAVACMD ${JAVA_OPTIONS} $bootclasspath -cp "$classpath" ${RMI_OPTIONS} ${SYS_PROPS} ${GS_LOGGING_CONFIG_FILE_PROP} ${LOOKUP_GROUPS_PROP} ${LOOKUP_LOCATORS_PROP} $launchTarget $config $command_line"
+command="$JAVACMD $bootclasspath -cp "$classpath" ${JAVA_OPTIONS} ${RMI_OPTIONS} ${SYS_PROPS} ${GS_LOGGING_CONFIG_FILE_PROP} ${LOOKUP_GROUPS_PROP} ${LOOKUP_LOCATORS_PROP} $launchTarget $config $command_line"
 
 echo
 echo Starting GigaSpaces Management Center:

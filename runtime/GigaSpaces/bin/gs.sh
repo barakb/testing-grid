@@ -31,22 +31,33 @@ toNative() {
 # set bootclasspath
 bootclasspath="-Xbootclasspath/p:$(toNative $XML_JARS)"
 
-GS_LIB="$JSHOMEDIR/lib"
+SERVICE_GRID_LIB="$JSHOMEDIR/lib/ServiceGrid"
+JINI_LIB="$JSHOMEDIR/lib/jini"
 
 # Function to find a file
 getPathForFile() {
     filename="$1"
-    if [ -f "$GS_LIB/platform/boot/$filename" ] ; then
-	located="$GS_LIB/platform/boot/$filename"
+    if [ -f "$SERVICE_GRID_LIB/$filename" ] ; then
+	located="$SERVICE_GRID_LIB/$filename"
     else
-    echo "Cannot locate $filename in the expected directory structure, exiting"
-    exit 1
+	if [ -f "$JSHOMEDIR/lib/sg/$filename" ] ; then
+	    located="$JSHOMEDIR/lib/sg/$filename"
+        else
+	    echo "Cannot locate $filename in the expected directory structure, exiting"
+	    exit 1
+        fi
     fi
 }
 
 # Locate the boot strapping jars
 getPathForFile gs-boot.jar
 gsboot=$located
+
+getPathForFile gs-lib.jar
+gslib=$located
+
+getPathForFile gs-admin.jar
+gsadmin=$located
 
 cygwin=
 case $OS in
@@ -62,7 +73,7 @@ toWindows() {
 # If the command is to start the Service Grid, invoke the SystemBoot facility.
 # Otherwise invoke the CLI to interafce with the product
 if [ "$start" = "1" ]; then
-    NATIVE_DIR="$(toNative $GS_LIB/platform/native)"
+    NATIVE_DIR="$(toNative $SERVICE_GRID_LIB/native)"
     # Check for running on OS/X
     opSys=`uname -s`
     if [ $opSys = "Darwin" ] ; then
@@ -74,19 +85,14 @@ if [ "$start" = "1" ]; then
             export LD_LIBRARY_PATH=$NATIVE_DIR
         fi
     fi
-# CPP Environment setup
-    if [ -f "${JSHOMEDIR}/cpp/setenv.sh" ]; then
-        . ${JSHOMEDIR}/cpp/setenv.sh
-        libpath="-Djava.library.path=$CPP_SPACE_LIB_PATH"
-	fi
 
-    classpath="-cp $(toNative $PRE_CLASSPATH:$JDBC_JARS:$SIGAR_JARS:$JSHOMEDIR:$JMX_JARS:$gsboot:$POST_CLASSPATH)"
+    classpath="-cp $(toNative $EXT_JARS:$JDBC_JARS:$JSHOMEDIR:$JMX_JARS:$gsboot:$JINI_LIB/start.jar)"
     launchTarget=com.gigaspaces.start.SystemBoot
-    "$JAVACMD" ${JAVA_OPTIONS} -DagentId=${AGENT_ID} -DgsaServiceID=${GSA_SERVICE_ID} $bootclasspath $classpath ${RMI_OPTIONS} $libpath ${LOOKUP_GROUPS_PROP} ${LOOKUP_LOCATORS_PROP} -Dcom.gs.logging.debug=false ${GS_LOGGING_CONFIG_FILE_PROP} $NETWORK $DEBUG $launchTarget $command_line
+    "$JAVACMD" $bootclasspath $classpath ${JAVA_OPTIONS} ${RMI_OPTIONS} $libpath ${LOOKUP_GROUPS_PROP} ${LOOKUP_LOCATORS_PROP} -Dcom.gs.logging.debug=false ${GS_LOGGING_CONFIG_FILE_PROP} $NETWORK $DEBUG $launchTarget $command_line
 else
-    cliExt="config/tools/gs_cli.config"
+    cliExt="$JSHOMEDIR/config/tools/gs_cli.config"
     launchTarget=com.gigaspaces.admin.cli.GS
-    classpath="-cp $(toNative $PRE_CLASSPATH:$JDBC_JARS:$JMX_JARS:$GS_JARS:$SPRING_JARS:$POST_CLASSPATH)"
-    "$JAVACMD" ${JAVA_OPTIONS} $bootclasspath $classpath ${RMI_OPTIONS} ${LOOKUP_GROUPS_PROP} ${LOOKUP_LOCATORS_PROP} -Dcom.gs.logging.debug=false ${GS_LOGGING_CONFIG_FILE_PROP} $launchTarget $cliExt $command_line
+    classpath="-cp $(toNative $JDBC_JARS:$JSHOMEDIR:$JMX_JARS:$gsadmin:$gslib:$JINI_LIB/jsk-lib.jar:$JINI_LIB/jsk-platform.jar:$JSHOMEDIR/lib/JSpaces.jar:$OPENSPACES_JARS:$SPRING_JARS:$COMMON_JARS)"
+    "$JAVACMD" $bootclasspath $classpath ${RMI_OPTIONS} ${LOOKUP_GROUPS_PROP} ${LOOKUP_LOCATORS_PROP} -Dcom.gs.logging.debug=false -Dhandlers=java.util.logging.FileHandler ${GS_LOGGING_CONFIG_FILE_PROP} $launchTarget $cliExt $command_line
     
 fi

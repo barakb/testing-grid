@@ -4,4 +4,4 @@ rem to start the GigaSpaces Grid Service Container
 rem
 title GigaSpaces Technologies Service Grid : GSC
 set command_line=%*
-call "%~dp0\gs.bat" start startGSC %command_line%
+call %~dp0\gs.bat start startGSC %command_line%

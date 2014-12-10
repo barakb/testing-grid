@@ -5,22 +5,39 @@ rem GigaSpaces Technologies Inc. Service Grid
 rem Use local variables
 setlocal
 
-@call "%~dp0\setenv.bat"
+@call %~dp0\setenv.bat
 
 rem Set local variables
-set GS_LIB=%JSHOMEDIR%\lib
+set SERVICE_GRID_LIB=%JSHOMEDIR%\lib\ServiceGrid
+set JINI_LIB=%JSHOMEDIR%\lib\jini
 
 rem set booclasspath 
 set bootclasspath=-Xbootclasspath/p:%XML_JARS%
 
 
+rem Find the jars to use
+if exist "%SERVICE_GRID_LIB%\gs-admin.jar" goto setgsadmin
+if not exist "%SERVICE_GRID_LIB%\gs-admin.jar" goto systemFailure
+set gsadmin=%SERVICE_GRID_LIB%\gs-admin.jar
+goto checkgslib
+:setgsadmin
+set gsadmin=%SERVICE_GRID_LIB%\gs-admin.jar
+
+:checkgslib
+if exist "%SERVICE_GRID_LIB%\gs-lib.jar" goto setgslib
+if not exist "%SERVICE_GRID_LIB%\gs-lib.jar" goto systemFailure
+set gslib=%SERVICE_GRID_LIB%\gs-lib.jar
+goto checkgsboot
+:setgslib
+set gslib=%SERVICE_GRID_LIB%\gs-lib.jar
+
 :checkgsboot
-if exist "%GS_LIB%\platform\boot\gs-boot.jar" goto setgsboot
-if not exist "%GS_LIB%\platform\boot\gs-boot.jar" goto systemFailure
-set gsboot=%GS_LIB%\platform\boot\gs-boot.jar
+if exist "%SERVICE_GRID_LIB%\gs-boot.jar" goto setgsboot
+if not exist "%SERVICE_GRID_LIB%\gs-boot.jar" goto systemFailure
+set gsboot=%SERVICE_GRID_LIB%\gs-boot.jar
 goto jarsfound
 :setgsboot
-set gsboot=%GS_LIB%\platform\boot\gs-boot.jar
+set gsboot=%SERVICE_GRID_LIB%\gs-boot.jar
 
 :jarsfound
 
@@ -29,13 +46,12 @@ if "%1"=="" goto interactive
 if "%1"=="start" goto start
 
 :interactive
-title GigaSpaces Technologies Service Grid : Interactive Shell
-set cliExt=config/tools/gs_cli.config
+set cliExt=%JSHOMEDIR%\config\tools\gs_cli.config
 set command_line=%*
 set launchTarget=com.gigaspaces.admin.cli.GS
-set classpath=-cp %PRE_CLASSPATH%;%GS_JARS%;"%GS_LIB%";%SPRING_JARS%;%POST_CLASSPATH%
+set classpath=-cp %JSHOMEDIR%;%gsadmin%;%JSHOMEDIR%/lib/JSpaces.jar;%JSHOMEDIR%/lib;%JSHOMEDIR%/lib/jini/jsk-lib.jar;%JSHOMEDIR%/lib/jini/jsk-platform.jar;%OPENSPACES_JARS%;%SPRING_JARS%;%COMMON_JARS%
 
-set COMMAND=%JAVACMD% %JAVA_OPTIONS% %bootclasspath% %classpath% %LOOKUP_LOCATORS_PROP% %LOOKUP_GROUPS_PROP% -Dcom.gs.logging.debug=false %GS_LOGGING_CONFIG_FILE_PROP% %launchTarget% %cliExt% %command_line%
+set COMMAND=%JAVACMD% %bootclasspath% %classpath% %JAVA_OPTIONS% %LOOKUP_LOCATORS_PROP% %LOOKUP_GROUPS_PROP% -Dcom.gs.logging.debug=false -Dhandlers=java.util.logging.FileHandler %GS_LOGGING_CONFIG_FILE_PROP% %launchTarget% %cliExt% %command_line%
 
 echo.
 echo Starting with line:
@@ -48,15 +64,11 @@ goto end
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
 rem of arguments (up to the command line limit, anyway).
-
-set services=
-
 shift
 :setupCommandLine
 if "%1"=="" goto commandLineParsed
 if "%1"=="startGSC" goto addGSC
 if "%1"=="startGSM" goto addGSM
-if "%1"=="startGSA" goto addGSA
 if "%1"=="startGS" goto addGS
 if "%1"=="startLH" goto addLH
 if "%1"=="startTM" goto addTM
@@ -95,17 +107,6 @@ goto commandLineParsed
 
 :addGSMsolo
     set services=GSM
-    shift
-    goto setupCommandLine
-
-:addGSA
-    if "%services%"=="" goto addGSAsolo
-    set services=%services%,GSA
-    shift
-    goto setupCommandLine
-
-:addGSAsolo
-    set services=GSA
     shift
     goto setupCommandLine
 
@@ -170,11 +171,11 @@ goto setupCommandLine
 set command_line=%options%
 set startParm=com.gigaspaces.start.services=\"%services%\"
 rem Set the path to include native library directory
-set PATH=%PATH%;%GS_LIB%\platform\native
+set PATH=%PATH%;%SERVICE_GRID_LIB%\native
 set launchTarget=com.gigaspaces.start.SystemBoot
-set classpath=-cp %PRE_CLASSPATH%;%JDBC_JARS%;"%JSHOMEDIR%";%JMX_JARS%;%SIGAR_JARS%;"%gsboot%";%POST_CLASSPATH%
+set classpath=-cp %JDBC_JARS%;%JSHOMEDIR%;%JMX_JARS%;%gsboot%;%JSHOMEDIR%/lib/jini/start.jar
 
-set COMMAND=%JAVACMD% %JAVA_OPTIONS%  -DagentId=%AGENT_ID% -DgsaServiceID=%GSA_SERVICE_ID%  %bootclasspath% %classpath% %RMI_OPTIONS% %LOOKUP_LOCATORS_PROP% %LOOKUP_GROUPS_PROP% -Dcom.gs.logging.debug=false %GS_LOGGING_CONFIG_FILE_PROP%  %launchTarget% %startParm% %command_line%
+set COMMAND=%JAVACMD% %bootclasspath% %classpath% %JAVA_OPTIONS% %RMI_OPTIONS% %LOOKUP_LOCATORS_PROP% %LOOKUP_GROUPS_PROP% -Dcom.gs.logging.debug=false %GS_LOGGING_CONFIG_FILE_PROP%  %launchTarget% %startParm% %command_line%
 
 echo.
 echo Starting with line:

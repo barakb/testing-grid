@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # This script provides the command and control utility for the 
 # GigaSpaces Technologies gsInstance.
 # The gsInstance script starts a space using the SpaceFinder utility.
@@ -46,7 +46,7 @@ export CPS
 
 
 if [ "${LOOKUPGROUPS}" = "" ] ; then
-  LOOKUPGROUPS="gigaspaces-7.0.0-XAPPremium-ga"; export LOOKUPGROUPS
+  LOOKUPGROUPS="gigaspaces-6.0XAP"; export LOOKUPGROUPS
 fi
 LOOKUP_GROUPS_PROP=-Dcom.gs.jini_lus.groups=${LOOKUPGROUPS}; export LOOKUP_GROUPS_PROP
 
@@ -69,7 +69,7 @@ APPEND_TO_CLASSPATH_ARG=$2
 #  The user may append any additional properties (such as system properties like -Dxxx etc.) to the command line.
 APPEND_ADDITIONAL_ARG=$3
 
-COMMAND_LINE="${JAVACMD} ${JAVA_OPTIONS} $bootclasspath ${RMI_OPTIONS} ${LOOKUP_LOCATORS_PROP} ${LOOKUP_GROUPS_PROP} -Dcom.gs.home=${JSHOMEDIR} -Dcom.gs.start-embedded-lus=true -Dcom.gs.start-embedded-mahalo=false -Dcom.gs.logging.debug=false ${GS_LOGGING_CONFIG_FILE_PROP} ${APPEND_ADDITIONAL_ARG} -classpath "${PRE_CLASSPATH}${CPS}${APPEND_TO_CLASSPATH_ARG}${CPS}${EXT_JARS}$CPS${SIGAR_JARS}$CPS${JDBC_JARS}${CPS}${GS_JARS}${CPS}${POST_CLASSPATH}" com.j_spaces.core.client.SpaceFinder "${SPACE_URL}""
+COMMAND_LINE="${JAVACMD} $bootclasspath ${JAVA_OPTIONS} ${RMI_OPTIONS} ${LOOKUP_LOCATORS_PROP} ${LOOKUP_GROUPS_PROP} -Dcom.gs.home=${JSHOMEDIR} -Dcom.gs.start-embedded-lus=true -Dcom.gs.start-embedded-mahalo=false -Dcom.gs.logging.debug=false ${GS_LOGGING_CONFIG_FILE_PROP} ${APPEND_ADDITIONAL_ARG} -classpath "${APPEND_TO_CLASSPATH_ARG}${CPS}${EXT_JARS}$CPS${JDBC_JARS}$CPS${JSHOMEDIR}${CPS}${JSHOMEDIR}/lib/JSpaces.jar" com.j_spaces.core.client.SpaceFinder "${SPACE_URL}""
 
 echo
 echo

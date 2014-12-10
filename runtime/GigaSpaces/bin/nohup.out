@@ -1,0 +1,108 @@
+JAVA_HOME environment variable is set to /export/utils/java/jdk1.6.0_43-64Bit in <GigaSpaces Root>\bin\setenv.sh
+Environment set successfully from ./..
+Starting a Space Instance
+Setting default space url to /./mySpace?schema=default&properties=gs&groups=gigaspaces-XAP6.0
+
+
+Starting gsInstance with line:
+/export/utils/java/jdk1.6.0_43-64Bit/bin/java -Xbootclasspath/p::./../lib/xml/xalan.jar:./../lib/xml/xercesImpl.jar:./../lib/xml/xml-apis.jar -showversion -Xmx512m -Dsun.rmi.dgc.client.gcInterval=36000000 -Djava.rmi.server.useCodebaseOnly=false -Dsun.rmi.dgc.server.gcInterval=36000000 -Djava.rmi.server.hostname=pc-lab65 -Djava.rmi.server.RMIClassLoaderSpi=default -Djava.rmi.server.logCalls=false -Dcom.gs.jini_lus.locators= -Dcom.gs.jini_lus.groups=gigaspaces-XAP6.0 -Dcom.gs.home=./.. -Dcom.gs.start-embedded-lus=true -Dcom.gs.start-embedded-mahalo=false -Dcom.gs.logging.debug=false -Djava.util.logging.config.file=./../config/gs_logging.properties -classpath :::./../lib/jdbc/*.*:./..:./../lib/JSpaces.jar com.j_spaces.core.client.SpaceFinder /./mySpace?schema=default&properties=gs&groups=gigaspaces-XAP6.0
+java version "1.6.0_43"
+Java(TM) SE Runtime Environment (build 1.6.0_43-b01)
+Java HotSpot(TM) 64-Bit Server VM (build 20.14-b01, mixed mode)
+
+CONFIG: Sets the system property ${com.gs.home} with value: ./../
+Dec 3, 2014 2:48:42 PM
+INFO [com.gigaspaces.container]: 
+
+ System Environment: 
+	 System:
+		 OS Version: 2.6.32-220.4.1.el6.x86_64
+		 Architecture: amd64
+		 OS Name: Linux
+		 Number Of Processors: 2
+	 J2SE Support:
+		 VM Vendor: Sun Microsystems Inc.
+		 Using Java Home: /export/utils/java/jdk1.6.0_43-64Bit/jre
+		 Java(TM) SE Runtime Environment
+		 Java HotSpot(TM) 64-Bit Server VM (build 20.14-b01 )
+	 JVM Memory:
+		 Max Heap Size (KB): 466048
+		 Current Allocated Heap Size (KB): 80717
+	 Network Interfaces Information:
+		 Host Name: [pc-lab65] 
+		 Network Interface Name: eth0 / eth0
+		 IP Address: fe80:0:0:0:c094:a8ff:fe2c:9ba8%2
+		 IP Address: 192.168.9.85
+		 Network Interface Name: lo / lo
+		 IP Address: 0:0:0:0:0:0:0:1%1
+		 IP Address: 127.0.0.1
+	 GigaSpaces Platform:
+		 Edition: 6.0 XAP
+		 Build: 2040
+
+
+
+Dec 3, 2014 2:48:42 PM
+INFO [com.gigaspaces.container]: Created RMIRegistry on: < 192.168.9.85:10098 >
+
+Dec 3, 2014 2:48:42 PM
+INFO [com.gigaspaces.container]: Webster HTTP server started successfully serving the following roots: ./..//lib;./..//lib/jini 
+ Webster serving on: 192.168.9.85:9813
+
+Dec 3, 2014 2:48:42 PM
+INFO [com.gigaspaces.container]: Space is using -Djava.rmi.server.codebase=http://pc-lab65:9813/JSpaces.jar http://pc-lab65:9813/jsk-dl.jar
+
+Dec 3, 2014 2:48:43 PM
+INFO [com.gigaspaces.core.lookupmanager]: 
+
+Directory Service (RMI Registry): 
+[  <mySpace_container> container bound successfully to RMIRegistry.  ]
+[  provider URL: rmi://192.168.9.85:10098  ]
+
+Dec 3, 2014 2:48:43 PM
+CONFIG [com.gigaspaces.core.config]: Loaded the requested space schema < default > to be used for the < mySpace > space configuration.
+
+Dec 3, 2014 2:48:43 PM
+CONFIG [com.gigaspaces.kernel]: JAR Specification version recognized as: [1.4]
+
+Dec 3, 2014 2:48:43 PM
+INFO [com.gigaspaces.core.common]: Space <mySpace_container:mySpace> started successfully
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.jmx]: 
+New JMXConnectorServer was successfully registered into the MBeanServer using service url: 
+service:jmx:rmi:///jndi/rmi://192.168.9.85:10098/jmxrmi
+
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.jmx]: 
+Space <mySpace_container:mySpace> MBean was registered successfully.
+
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.core.lookupmanager]: 
+
+Directory Service (RMI Registry): 
+[  <mySpace_container:mySpace> space bound successfully to RMIRegistry.  ]
+[  provider URL: rmi://192.168.9.85:10098  ]
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.jmx]: 
+Container <mySpace_container> MBean was registered successfully.
+
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.jmx]: 
+Transport MBean was registered successfully for container <mySpace_container>
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.container]: 
+*** Welcome to the GigaSpaces world ! - GigaSpaces Platform(TM) 6.0 XAP edition (build 2040) ***
+*** Server started successfully ! ***
+
+Dec 3, 2014 2:48:44 PM
+INFO [com.gigaspaces.common.spacefinder]: java:// protocol. Get <mySpace> space from <mySpace_container> container
+
+./gsInstance.sh: line 79:  5645 Killed                  ${COMMAND_LINE}
+
+

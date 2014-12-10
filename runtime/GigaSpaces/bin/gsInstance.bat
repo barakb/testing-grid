@@ -20,7 +20,7 @@ rem Or gsInstance "" "" "-DmyOwnSysProp=value -DmyOwnSysProp2=value"
 rem In this case it will use the default space URL and classpath and just append new sys props.
 
 @rem The call to setenv.bat can be commented out if necessary.
-@call "%~dp0\setenv.bat"
+@call %~dp0\setenv.bat
 rem Use local variables
 rem setlocal
 
@@ -31,7 +31,7 @@ set bootclasspath=-Xbootclasspath/p:%XML_JARS%
 @set JSHOMEDIR=%~dp0\..
 
 if %LOOKUPGROUPS% == ""  (
-  set LOOKUPGROUPS="gigaspaces-7.0.0-XAPPremium-ga"
+  set LOOKUPGROUPS="gigaspaces-6.0XAP"
 )
 set LOOKUP_GROUPS_PROP=-Dcom.gs.jini_lus.groups=%LOOKUPGROUPS%
 
@@ -50,16 +50,11 @@ set TITLE="Space Instance ["%SPACE_URL%"] started on [%computername%]"
 @title %TITLE%
 
 rem The user may append any user defined directories to the classpath.
-if NOT "%~2" == "" (
-  set APPEND_TO_CLASSPATH_ARG="%~2"
-)
-
+set APPEND_TO_CLASSPATH_ARG=%~2
 rem The user may append any additional properties (such as system properties like -Dxxx etc.) to the command line.
-if NOT "%~3" == "" (
-  set APPEND_ADDITIONAL_ARG="%~3"
-)
+set APPEND_ADDITIONAL_ARG=%~3
 
-set COMMAND_LINE=%JAVACMD% %JAVA_OPTIONS% %bootclasspath% %LOOKUP_LOCATORS_PROP% %LOOKUP_GROUPS_PROP% %RMI_OPTIONS% "-Dcom.gs.home=%JSHOMEDIR%" -Dcom.gs.start-embedded-lus=true -Dcom.gs.start-embedded-mahalo=false -Dcom.gs.logging.debug=false %GS_LOGGING_CONFIG_FILE_PROP% %APPEND_ADDITIONAL_ARG% -classpath %PRE_CLASSPATH%;%APPEND_TO_CLASSPATH_ARG%;%JDBC_JARS%;%SIGAR_JARS%;%GS_JARS%;%POST_CLASSPATH% com.j_spaces.core.client.SpaceFinder %SPACE_URL%
+set COMMAND_LINE=%JAVACMD% %bootclasspath% %JAVA_OPTIONS% %LOOKUP_LOCATORS_PROP% %LOOKUP_GROUPS_PROP% %RMI_OPTIONS% "-Dcom.gs.home=%JSHOMEDIR%" -Dcom.gs.start-embedded-lus=true -Dcom.gs.start-embedded-mahalo=false -Dcom.gs.logging.debug=false %GS_LOGGING_CONFIG_FILE_PROP% %APPEND_ADDITIONAL_ARG% -classpath "%APPEND_TO_CLASSPATH_ARG%;%EXT_JARS%;%JDBC_JARS%;%JSHOMEDIR%;%JSHOMEDIR%\lib\JSpaces.jar" com.j_spaces.core.client.SpaceFinder %SPACE_URL%
 
 echo.
 echo.

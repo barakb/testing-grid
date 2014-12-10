@@ -5,41 +5,32 @@
 @rem
 @rem JAVA_HOME  - Location of the JDK version used to start GigaSpaces 
 @rem              Server.
-@rem          Note that YOU MUST SUPPLY A JAVA_HOME environment variable 
+@rem          Note that YOU MUST SUPPLY A JAVA_HOME environment variable.
 @rem JAVACMD - The Java command-line
 @rem  
 @rem JAVA_OPTIONS   - Java command-line options for running the server,
 @rem            Including: The Java args to override the standard memory arguments passed to java,
 @rem            - Arg specifying the JVM to run.  (i.e. -server, -hotspot, -jrocket etc.)
 @rem            - GC, profiling and management options.
-@rem		- These settings can be overridden externally to this script.
-@rem
-@rem EXT_JAVA_OPTIONS 	- Extended java option such as system properties or other JVM arguments that can be passed to the JVM command line. 
-@rem					- These settings can be overridden externally to this script.
-@rem
-@rem JAVA_VENDOR JAVA_VERSION
-@rem        - Vendor (i.e. All, BEA, HP, IBM, Sun, etc.) and version of the JVM (1.5, 1.6)  
-@rem		- The JVM default settings are set according to the JVM 
-@rem        vendor and version. A java code is executed in order to fetch these details.
+@rem JAVA_VENDOR
+@rem            - Vendor of the JVM (i.e. All, BEA, HP, IBM, Sun, etc.) 
+@rem		- Default is ALL, meaning general settings
 @rem RMI_OPTIONS
 @rem            - Additional RMI optional properties.  
+@rem JAVA_VM - The java arg specifying the JVM to run.  (i.e. 
+@rem              -server, -hotspot, -jrocket etc.)
 @rem
 @rem JSHOMEDIR - The GigaSpaces home directory.
 @rem            
-@rem POLICY - The default Java security policy file.
+@rem POLICY - The default security policy file.
 @rem LOOKUPGROUPS - Jini Lookup Service Group
 @rem
 @rem LOOKUPLOCATORS - Jini Lookup Service Locators used for unicast discovery
 @rem
 @rem NIC_ADDR 	  - The Network Interface card IP Address
 @rem 
-@rem PRE_CLASSPATH  - Path style variable to be added to the beginning of the 
-@rem                  system CLASSPATH 
-@rem POST_CLASSPATH - Path style variable to be added to the end of the 
-@rem                  system CLASSPATH.
-@rem 
 @rem  For additional information, refer to the GigaSpaces OnLine Documentation
-@rem  at http://www.gigaspaces.com/wiki/display/OLH/System+Environment
+@rem  at http://www.gigaspaces.com/wiki/display/GS/System+Environment
 @rem *************************************************************************
 @echo off
 
@@ -49,52 +40,34 @@ if "%VERBOSE%" == "" (
 )
 
 @rem - Set or override the JAVA_HOME variable
-@rem - By default, the system variable value is used.
-
-@rem Note - If the JAVA_HOME is a path which contains white spaces, you need to surround the 
-@rem JAVACMD, JAVACCMD and JAVAWCMD variable with quotes
-
-@rem set JAVA_HOME=D:\jdk1.5.0_15
+@rem - By default, the system value is used.
+@rem set JAVA_HOME="D:\jdk1.5.0_04"
 @rem - Reset JAVA_HOME unless JAVA_HOME is pre-defined.
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 
-@rem @echo JAVA_HOME environment variable is set to %JAVA_HOME% in "<GigaSpaces Root>\bin\setenv.bat"
+@echo JAVA_HOME environment variable is set to %JAVA_HOME% in "<GigaSpaces Root>\bin\setenv.bat"
 set JAVACMD="%JAVA_HOME%\bin\java"
 set JAVACCMD="%JAVA_HOME%\bin\javac"
 set JAVAWCMD="%JAVA_HOME%\bin\javaw"
 goto endOfJavaHome
 
 :noJavaHome
-@rem @echo The JAVA_HOME environment variable is not set. Using the java that is set in system path."
+@echo The JAVA_HOME environment variable is not set. Using the java that is set in system path."
 set JAVACMD=java
 set JAVACCMD=javac
 set JAVAWCMD=javaw
 
 :endOfJavaHome
 
-if "%JSHOMEDIR%" == "" set JSHOMEDIR=%~dp0\..
-
-if "%1" == "javaversion"  (
-%JAVACMD% -cp "%~dp0\..\lib\required\gs-runtime.jar" com.gigaspaces.internal.utils.OutputJVMVersion
-goto END
-)
-FOR /F "usebackq tokens=*" %%i IN (`"%~dp0\..\bin\setenv.bat" javaversion`) DO @set JAVA_VERSION=%%i
-
-if "%1" == "javavendor"  (
-%JAVACMD% -cp "%~dp0\..\lib\required\gs-runtime.jar" com.gigaspaces.internal.utils.OutputJVMVendorName
-goto END
-)
-FOR /F "usebackq tokens=*" %%i IN (`"%~dp0\..\bin\setenv.bat" javavendor`) DO @set JAVA_VENDOR=%%i
-
-if "%EXT_JAVA_OPTIONS%" == "" (
-set EXT_JAVA_OPTIONS=-Xmx512m
-)
-
 if DEFINED JAVA_OPTIONS goto continue
-@rem Reset JAVA_VENDOR/JAVA_VERSION unless JAVA_VENDOR/JAVA_VERSION is defined already.
+@rem Reset JAVA_VENDOR unless JAVA_VENDOR is defined already.
 if DEFINED JAVA_VENDOR goto noReset
-if DEFINED JAVA_VERSION goto noReset
+@rem JAVA VENDOR, possible values are:
+@rem ALL, BEA, HP, IBM, Sun, etc. - Default is ALL, meaning general settings
+set  JAVA_VENDOR=ALL
+
+@rem echo JAVA_VENDOR environment variable is set to %JAVA_VENDOR% in "<GigaSpaces Root>\bin\setenv.bat"
 
 :noReset
 @rem set up JVM Vendors
@@ -106,12 +79,12 @@ if "%JAVA_VENDOR%" == "HP"  goto hp
 goto continue
 
 :all
-set JAVA_OPTIONS= -server -showversion %EXT_JAVA_OPTIONS%
+set JAVA_OPTIONS= -server -showversion -Xmx512m
 goto continue
 
 :bea
 @rem more available options:  -Xgcprio:pausetime -XpauseTarget=200ms
-set JAVA_OPTIONS= -server -showversion -XXaggressive -Xgcprio:throughput %EXT_JAVA_OPTIONS%
+set JAVA_OPTIONS= -server -showversion -Xmx512m -Xgcprio:throughput
 goto continue
 
 rem The following parameters have been found optimal when using Solaris 10 on Sun CoolThreads Servers T1000/T2000 (Niagara) 
@@ -119,111 +92,92 @@ rem during extensive tests, using Sun JVM 1.5.0_06 and JVM 6.
 rem In order to apply these VM switches, please add them to the JAVA_OPTIONS variable:
 
 rem Optimal performance has been achieved with 2GB heap, it should be adjusted to real RAM size
-rem -Xms2g -Xmx2g
-rem GC Threads quantity is, by default, equal to quantity of CPU cores 
+rem -Xms2g �Xmx2g
+rem -XX:+UseParallelOldGC
+rem GC Threads quantity is, by default, equal to quantity of CPUs; 
 rem On single/dual CPU systems recommended to be set as 4 - 8
+rem -XX:ParallelGCThreads=20
+rem -XX:+UseParallelGC
 
+rem Bundle of JVM options planned as default for upcoming release. 
+rem Provides boost about 7-8%.
+rem -XX:+AggressiveOpts
+rem -XX:NewRatio=2                  
+rem -XX:SurvivorRatio=32 
+rem -XX:MaxTenuringThreshold=4
 rem Relevant to Solaris 10
 rem -XX:LargePageSizeInBytes=256m
 
-rem This VM option tells the HotSpot VM to generate a heap dump when the first thread throws OutOfMemoryError 
-rem because the java heap or the permanent generation is full. A heap dump is useful in production systems 
-rem where you need to diagnose an unexpected failure. Note it does not impact performance.
-rem It is supported from 5.0u7 and JDK 1.6 but it is up to the VM vendor to
-rem support it in future versions.
-rem -XX:+HeapDumpOnOutOfMemoryError
-
-rem The following parameters have been found optimal when using Sun 1.5 JVM for low latency deterministic client and server behavior 
-rem excluding false failure recovery caused by very long GC pauses.
-rem 
-rem Note that these are advanced settings and specific to a given scenario. 
-rem It might also reduce the throughput. It will probably require tuning adjustments 
-rem to the recommended values and should be done with special care!
-rem
-rem In order to apply these VM switches, please add them to the JAVA_OPTIONS variable:
-rem -server -showversion -Xmx512m -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Xmn100m -XX:ParallelGCThreads=4
 
 :sun
-rem -XX:+UseConcMarkSweepGC	- Use concurrent mark-sweep collection for the old generation
-rem -XX:+UseParNewGC              	- Use a parallel collection for the young generation
-rem -XX:+ParallelGCThreads=<value> 	- Quantity of garbage collection threads
-rem -Xmx<value>                     		- Max JVM heap size - Note that each script sets its own -Xmx values and it is not been set through the JAVA_OPTIONS variable
-rem -Xms<value>                     		- Initial JVM heap size - It is recommended to define Xms equal to Xmx to achieve higher performance
-rem						Note that each script sets its own -Xms values and it is not been set through the JAVA_OPTIONS variable
-rem
-set JAVA_OPTIONS= -server -XX:+AggressiveOpts -showversion %EXT_JAVA_OPTIONS%
+set JAVA_OPTIONS= -server -showversion -Xmx512m
 goto continue
 
 :ibm
-set JAVA_OPTIONS= -showversion %EXT_JAVA_OPTIONS%
+set JAVA_OPTIONS= -showversion -Xmx512m
 goto continue
 
 :hp
-set JAVA_OPTIONS= -server -showversion %EXT_JAVA_OPTIONS%
+set JAVA_OPTIONS= -server -showversion -Xmx512m
 goto continue
 
 
 :continue
+if "%JSHOMEDIR%" == "" set JSHOMEDIR=%~dp0\..
 
 rem Append all files of lib/ext directory to the classpath
 set LCP=%JSHOMEDIR%\lib
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\required\*.jar") do call "%JSHOMEDIR%\bin\lcp" "%%i"
-set GS_JARS=%LCP%
-
-set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\optional\spring\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
-set SPRING_JARS=%LCP%
-
-rem Optional Sigar Jars
-set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\sigar\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
-set SIGAR_JARS=%LCP%
-
-set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\ant\*.jar") do call "%JSHOMEDIR%\bin\lcp" "%%i"
+for %%i in ("%JSHOMEDIR%\lib\ant\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
 set ANT_JARS=%LCP%
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\jdbc\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
-for %%i in ("%JSHOMEDIR%\lib\platform\jdbc\*.zip") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
+for %%i in ("%JSHOMEDIR%\lib\hibernate\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
+set HIBERNATE_JARS=%LCP%
+
+set LCP=.
+for %%i in ("%JSHOMEDIR%\lib\jdbc\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
+for %%i in ("%JSHOMEDIR%\lib\jdbc\*.zip") do call %JSHOMEDIR%\bin\lcp %%i
 set JDBC_JARS=%LCP%
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\xml\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
+for %%i in ("%JSHOMEDIR%\lib\xml\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
 set XML_JARS=%LCP%
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\poi\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
-set POI_JARS=%LCP%
+for %%i in ("%JSHOMEDIR%\lib\ui\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
+set UI_JARS=%LCP%
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\ui\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
-set UI_JARS=%LCP%;%POI_JARS%
-
-
-set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\jmx\*.jar") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
+for %%i in ("%JSHOMEDIR%\lib\jmx\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
 set JMX_JARS=%LCP%
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\platform\ext\*.*") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
+for %%i in ("%JSHOMEDIR%\lib\common\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
+set COMMON_JARS=%LCP%
+
+set LCP=.
+for %%i in ("%JSHOMEDIR%\lib\spring\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
+set SPRING_JARS=%LCP%
+
+set LCP=.
+for %%i in ("%JSHOMEDIR%\lib\ext\*.*") do call %JSHOMEDIR%\bin\lcp %%i
 set EXT_JARS=%LCP%
 
 set LCP=.
-for %%i in ("%JSHOMEDIR%\lib\optional\pu-common\*.*") do call "%JSHOMEDIR%\bin\lcp"  "%%i"
-set PU_COMMON_JARS=%LCP%
+for %%i in ("%JSHOMEDIR%\lib\openspaces\*.jar") do call %JSHOMEDIR%\bin\lcp %%i
+set OPENSPACES_JARS=%LCP%
 
-rem the GS_JARS contains the same list as defined in the Class-Path entry of the gs-runtime.jar manifest file.
+rem the GS_JARS contains the same list as defined in the Class-Path entry of the JSpaces.jar manifest file.
 rem These jars are required for client application and starting a Space from within your application.
-set GS_JARS=%EXT_JARS%;"%JSHOMEDIR%";%GS_JARS%;%PU_COMMON_JARS%
+set GS_JARS=%EXT_JARS%;%JSHOMEDIR%;%JSHOMEDIR%/lib/JSpaces.jar;%JSHOMEDIR%/lib/jini/jsk-platform.jar;%JSHOMEDIR%/lib/jini/jsk-lib.jar;%JSHOMEDIR%/lib/jini/mahalo.jar;%JSHOMEDIR%/lib/jini/reggie.jar;%JSHOMEDIR%/lib/jini/start.jar;%JSHOMEDIR%/lib/common/backport-util-concurrent.jar;%JSHOMEDIR%/lib/ServiceGrid/gs-lib.jar;%JSHOMEDIR%/lib/ServiceGrid/gs-boot.jar
 
-set PLATFORM_VERSION=7.0
-set POLICY="%JSHOMEDIR%\policy\policy.all"
+set PLATFORM_VERSION=6.0
+set POLICY=%JSHOMEDIR%\policy\policy.all
 
 if "%LOOKUPGROUPS%" == ""  (
-set LOOKUPGROUPS="gigaspaces-7.0.0-XAPPremium-ga"
+set LOOKUPGROUPS="gigaspaces-6.0XAP"
 )
 set LOOKUP_GROUPS_PROP=-Dcom.gs.jini_lus.groups=%LOOKUPGROUPS%
 
@@ -253,9 +207,9 @@ rem Setting this property will redirect all Jini services and GS modules output 
 rem Specific logging settings can be provided by setting the following before calling setenv:
 rem export GS_LOGGING_CONFIG_FILE=/somepath/my_logging.properties
 if "%GS_LOGGING_CONFIG_FILE%" == "" (
-set GS_LOGGING_CONFIG_FILE=%JSHOMEDIR%/config/gs_logging.properties
+set GS_LOGGING_CONFIG_FILE="%JSHOMEDIR%/config/gs_logging.properties"
 )
-set GS_LOGGING_CONFIG_FILE_PROP=-Djava.util.logging.config.file="%GS_LOGGING_CONFIG_FILE%"
+set GS_LOGGING_CONFIG_FILE_PROP=-Djava.util.logging.config.file=%GS_LOGGING_CONFIG_FILE%
 
 rem Enable monitoring and management from remote systems using JMX jconsole.
 set REMOTE_JMX=-Dcom.sun.management.jmxremote.port=5001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
@@ -268,7 +222,7 @@ if "%VERBOSE%"=="true" (
 	echo.
 	echo JAVACMD: %JAVACMD%    		JAVACCMD: %JAVACCMD%		JAVAWCMD: %JAVAWCMD%
 	echo.
-	echo JAVA_OPTIONS: %JAVA_OPTIONS%	EXT_JAVA_OPTIONS: %EXT_JAVA_OPTIONS%	JAVA_VERSION: %JAVA_VERSION% JAVA_VENDOR: %JAVA_VENDOR%
+	echo JAVA_OPTIONS: %JAVA_OPTIONS%
 	echo.
 	echo NIC_ADDR: %NIC_ADDR%
 	echo.
@@ -280,6 +234,8 @@ if "%VERBOSE%"=="true" (
 	echo.
 	echo ANT_JARS: %ANT_JARS%
 	echo.
+	echo HIBERNATE_JARS: %HIBERNATE_JARS%
+	echo.
 	echo JDBC_JARS: %JDBC_JARS%
 	echo.
 	echo XML_JARS: %XML_JARS%
@@ -288,6 +244,8 @@ if "%VERBOSE%"=="true" (
 	echo.
 	echo JMX_JARS: %JMX_JARS%
 	echo.
+	echo COMMON_JARS: %COMMON_JARS%
+	echo.
 	echo SPRING_JARS: %SPRING_JARS%
 	echo.
 	echo EXT_JARS: %EXT_JARS%
@@ -295,6 +253,8 @@ if "%VERBOSE%"=="true" (
 	echo GS_LOGGING_CONFIG_FILE_PROP: %GS_LOGGING_CONFIG_FILE_PROP%
 	echo.
 	echo ====================================================================================
+) else (
+	echo Environment set successfully from %JSHOMEDIR%
 )
 
 :end
