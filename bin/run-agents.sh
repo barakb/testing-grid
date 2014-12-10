@@ -8,6 +8,6 @@ fi
 
 for ((i=1;i<=$1;i++));
 do
-   nohup ./agent.sh &
+   nohup ./agent.sh &> /dev/null &
    echo "starting egent $1"
 done
