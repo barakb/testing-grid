@@ -46,7 +46,7 @@ TGRID_LOGGING_FILE_PROP="-Djava.util.logging.config.file=${TGRID_ROOT_DIR}/confi
 #-Dtgrid-suite-reporters=com.gigaspaces.tgrid.report.ConsoleReporter
 
 # TGrid JVM system properties
-TGRID_JVM_PROPERTIES="-Djava.security.policy=${RUNTIME_HOMEDIR}/policy/policy.all ${TGRID_LOGGING_FILE_PROP} -Djava.rmi.server.useCodebaseOnly=false -Dcom.gigaspaces.tgrid.base-build-dir=/var/tmp/tgrid"
+TGRID_JVM_PROPERTIES="-Djava.security.policy=${RUNTIME_HOMEDIR}/policy/policy.all ${TGRID_LOGGING_FILE_PROP} -Djava.rmi.server.useCodebaseOnly=false -Dcom.gigaspaces.tgrid.base-build-dir=/var/tmp/tgrid -Dtgrid-suite-reporters=com.gigaspaces.tgrid.report.ConsoleReporter"
 
 # TGrid Manifest Overrides
 MANIFEST_OVERRIDES=$8
