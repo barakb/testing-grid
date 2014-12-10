@@ -6,8 +6,10 @@ if [ $# -eq 0 ]
     exit 1
 fi
 
+echo "starting $1 agents." 
+
 for ((i=1;i<=$1;i++));
 do
    nohup ./agent.sh &> /dev/null &
-   echo "starting egent $1"
+   echo "starting egent $i"
 done

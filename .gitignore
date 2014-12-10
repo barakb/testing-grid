@@ -1,3 +1,5 @@
 local-builds
 *~
 nohup.out
+log
+logs
