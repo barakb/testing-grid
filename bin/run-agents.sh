@@ -11,5 +11,5 @@ echo "starting $1 agents."
 for ((i=1;i<=$1;i++));
 do
    nohup ./agent.sh &> /dev/null &
-   echo "starting egent $i"
+   echo "starting agent $i"
 done

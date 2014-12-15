@@ -32,7 +32,13 @@ fi
 #init command line
 export LD_LIBRARY_PATH=/export/tgrid/TestingGrid1.5.0/libfdf:/usr/lib64:/usr/local/lib64:/export/utils/your-kit/yjp-6.0.14/lib:/usr/local/lib:/export/utils/lib
 echo start submitter LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
-CMD="${JAVACMD} -Xmx1524m ${REMOTE_DEBUG} ${TGRID_JVM_PROPERTIES} ${MANIFEST_OVERRIDES} -cp ${TGRID_CLASSPATH}:${SUITE_JAR_PATH} com.gigaspaces.tgrid.submission.TGridSubmitter ${SUITE_JAR_PATH}" 
+
+if [ "$2" = "" ]
+then
+    CMD="${JAVACMD} -Xmx1524m ${REMOTE_DEBUG} ${TGRID_JVM_PROPERTIES} ${MANIFEST_OVERRIDES} -cp ${TGRID_CLASSPATH}:${SUITE_JAR_PATH} com.gigaspaces.tgrid.submission.TGridSubmitter ${SUITE_JAR_PATH}" 
+else
+    CMD="${JAVACMD} -Xmx1524m ${REMOTE_DEBUG} ${TGRID_JVM_PROPERTIES} ${MANIFEST_OVERRIDES} -DSuite-Version=Isolated_Regression_Report -DBuild-Version="$2" -cp ${TGRID_CLASSPATH}:${SUITE_JAR_PATH} com.gigaspaces.tgrid.submission.TGridSubmitter ${SUITE_JAR_PATH}" 
+fi
 #CMD="${JAVACMD} -Xmx1524m ${REMOTE_DEBUG} -Djava.library.path=/export/tgrid/TestingGrid1.5.0/libfdf ${TGRID_JVM_PROPERTIES} ${MANIFEST_OVERRIDES} -cp ${TGRID_CLASSPATH}:${SUITE_JAR_PATH} com.gigaspaces.tgrid.submission.TGridSubmitter ${SUITE_JAR_PATH}" 
 
 
