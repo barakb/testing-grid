@@ -46,7 +46,7 @@ TGRID_LOGGING_FILE_PROP="-Djava.util.logging.config.file=${TGRID_ROOT_DIR}/confi
 #-Dtgrid-suite-reporters=com.gigaspaces.tgrid.report.ConsoleReporter
 
 # TGrid JVM system properties
-#TGRID_SANITY_FILE="-Dtgrid-suite-factory-args=externalPermutationFile=/home/xap/testing-grid/local-builds/build_10811-443_9.7.1/QA/sanity/permutations.txt"
+#TGRID_SANITY_FILE="-Dtgrid-suite-factory-args=externalPermutationFile=/home/xap/testing-grid/bin/permutations.txt"
 TGRID_JVM_PROPERTIES="-Djava.security.policy=${RUNTIME_HOMEDIR}/policy/policy.all ${TGRID_LOGGING_FILE_PROP} -Djava.rmi.server.useCodebaseOnly=false -Dcom.gigaspaces.tgrid.base-build-dir=/var/tmp/tgrid ${TGRID_SANITY_FILE}"
 
 # TGrid Manifest Overrides
