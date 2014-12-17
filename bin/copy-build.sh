@@ -1,20 +1,19 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-  echo -e "\nUsage $0 build_[build-number] : install this build and mark it to run in the next loop\n"
-  echo -e "\nUsage $0 mileston [build-number-prefix] : install the last build of this milestone and mark it to run in the next loop\n"
-  exit 1
-elif [ $# -eq 1 ]; then
-  BUILD=$1
-elif [ $# -eq 2 ]; then
-  echo "ls -1 /mnt/tarzan/builds/xap/xap10/10.1.0/ | grep $2 | tail -n1"
-  BUILD=`ls -1 /mnt/tarzan/builds/xap/xap10/10.1.0/ | grep $2 | tail -n1`
-  echo "BUILD is $BUILD"
-fi
 
-echo "${BUILD}" > build.txt
+#BUILD=build_12588-2798
+#BUILD_NO=12588-2798
+BUILD_NO=`./select-latest-build.sh`
+BUILD=build_${BUILD_NO}
+echo "${BUILD_NO}" > build.txt
 
-BUILDDIR=../local-builds/${BUILD}
+
+echo "-------------"
+cat build.txt
+echo "-------------"
+
+
+BUILDDIR=../local-builds/${BUILD_NO}
 if [ -d "${BUILDDIR}" ];
 then
   echo "folder ${BUILDDIR} exists"
@@ -26,7 +25,7 @@ echo "Waiting 30 seconds for builder deployment finish"
 
 mkdir -p  ${BUILDDIR}
 PREFIX="build_";
-BUILD_NO=${BUILD#$PREFIX}
+
 cp /mnt/tarzan/builds/xap/xap10/10.1.0/${BUILD}/xap-premium/1.5/gigaspaces-xap-premium-*-b${BUILD_NO}.zip ${BUILDDIR}/
 cp /mnt/tarzan/builds/xap/xap10/10.1.0/${BUILD}/testsuite-1.5.zip  ${BUILDDIR}
 for f in ${BUILDDIR}/*.zip
@@ -37,5 +36,5 @@ done
 rm ${BUILDDIR}/*.zip
 
 #barak todo remove when builds with good tf.jar starts comming. 16/12
-cp -f  ../tf.jar ${BUILDDIR}/QA/lib/
+#cp -f  ../tf.jar ${BUILDDIR}/QA/lib/
 
