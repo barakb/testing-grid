@@ -14,7 +14,8 @@ while true; do
     SELECTED_BUILD_DIR=/home/xap/testing-grid/local-builds/${BUILD}
     echo "Running build ${SELECTED_BUILD_DIR}"
     rm -rf /var/tmp/tgrid/QA/status/*
-    name=$(date +%y%m%d%H%M)
+    mkdir -p -v logs/${BUILD}
+    name=`./counter.sh logs/${BUILD}`
     logdir=logs/${BUILD}/${name}
     mkdir -p -v ${logdir}
     echo "-- killing all java --"
