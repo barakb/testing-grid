@@ -12,6 +12,12 @@ while true; do
     ./copy-build.sh
     BUILD=$(head -n 1 build.txt)
     SELECTED_BUILD_DIR=/home/xap/testing-grid/local-builds/${BUILD}
+    # BARAK TODO REMOVE
+    echo "cp -f tf.jar ${SELECTED_BUILD_DIR}/QA/lib/"
+    cp -f tf.jar ${SELECTED_BUILD_DIR}/QA/lib/
+    echo "cp -f ${SELECTED_BUILD_DIR}/QA/lib/gs-openspaces-*-tests.jar ${SELECTED_BUILD_DIR}/QA/lib/gs-openspaces-tests.jar"
+    cp -f ${SELECTED_BUILD_DIR}/QA/lib/gs-openspaces-*-tests.jar ${SELECTED_BUILD_DIR}/QA/lib/gs-openspaces-tests.jar
+    
     echo "Running build ${SELECTED_BUILD_DIR}"
     rm -rf /var/tmp/tgrid/QA/status/*
     mkdir -p -v logs/${BUILD}
