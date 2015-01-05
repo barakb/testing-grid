@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 
 #BUILD=build_12588-2798

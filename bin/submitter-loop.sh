@@ -9,6 +9,7 @@
 
 while true; do
 #    ./clean-local-builds.sh
+    rm -rf /tmp/tgrid*
     ./copy-build.sh
     BUILD=$(head -n 1 build.txt)
     SELECTED_BUILD_DIR=/home/xap/testing-grid/local-builds/${BUILD}
